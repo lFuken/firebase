@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire base</title>
+</head>
+
+<body>
+    <h1>Area de registro</h1>
+    <input type="email" id="email" placeholder="Coloca tu email" />
+    <input type="password" id="pass" placeholder="Coloca tu password" />
+    <button onclick="enviar()"> Enviar </button>
+
+    <h1>Area de acceso</h1>
+    <input type="email" id="emailA" placeholder="Coloca tu email" />
+    <input type="password" id="passA" placeholder="Coloca tu password" />
+    <button onclick="acceso()"> Acceso </button>
+
+    <h1 id="login"></h1>
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-analytics.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        var firebaseConfig = {
+            apiKey: "AIzaSyB7g4EVeQlD2WKwX7bNEaLdfM3b5ogyc8A",
+            authDomain: "usuarios-a77e3.firebaseapp.com",
+            databaseURL: "https://usuarios-a77e3.firebaseio.com",
+            projectId: "usuarios-a77e3",
+            storageBucket: "usuarios-a77e3.appspot.com",
+            messagingSenderId: "641748402157",
+            appId: "1:641748402157:web:42445c03ee6661464571e4",
+            measurementId: "G-CMMLT8Y69K"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                // User is signed in.
+                var displayName = user.displayName;
+                var email = user.email;
+                var emailVerified = user.emailVerified;
+                var photoURL = user.photoURL;
+                var isAnonymous = user.isAnonymous;
+                var uid = user.uid;
+                var textoverificado = "";
+                if (emailVerified == false) {
+                    textoverificado = "Email no verificado";
+                } else {
+                    textoverificado = "Email verificado";
+                }
+                var providerData = user.providerData;
+                document.getElementById('login').innerHTML =
+                    `<p>logueado ` + user.email + `` + textoverificado + `</p>
+                <button onclick="cerrar()">Cerrar cession</button>
+                `;
+
+                // ...
+            } else {
+                document.getElementById('login').innerHTML = "No logueado";
+                // User is signed out.
+                // ...
+            }
+        });
+
+        function enviar() {
+            var email = document.getElementById('email').value;
+            var pass = document.getElementById('pass').value;
+            //alert("email" + email + "password" + pass);
+            firebase.auth().createUserWithEmailAndPassword(email, pass).catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                alert(errorMessage)
+            }).then(function() {
+                verificar();
+            });
+        }
+
+        function verificar() {
+            var user = firebase.auth().currentUser;
+
+            user.sendEmailVerification().then(function() {
+                // Email sent.
+            }).catch(function(error) {
+                // An error happened.
+            });
+        }
+
+        function acceso() {
+            var emailA = document.getElementById('emailA').value;
+            var passA = document.getElementById('passA').value;
+            //alert("email" + email + "password" + pass);
+            firebase.auth().signInWithEmailAndPassword(emailA, passA).catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // ...
+                alert(errorMessage)
+            });
+        }
+
+        function cerrar() {
+            firebase.auth().signOut()
+                .then(function() {
+                    console.log('salir');
+                })
+                .catch(function(error) {
+                    console.log(error);
+                })
+        }
+    </script>
+</body>
+
+</html>
